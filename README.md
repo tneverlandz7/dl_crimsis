@@ -190,14 +190,24 @@ save_predictions(test_df, preds, probs, task, out_dir / "predictions_test.csv")
 python -m src.baseline --task informative --exp-id A-inf-majority-s0-final-01
 python -m src.run_text --task informative --encoder textcnn --seed 0 --run-type debug --exp-id A-inf-textcnn-s0-dbg-03
 python -m src.run_text --task informative --encoder bilstm --seed 1 --run-type final --exp-id A-inf-bilstm-s1-final-01
+python -m src.run_image --task informative --seed 0 --run-type final --exp-id A-inf-image-s0-final-01
 python -m src.run_fusion --task informative --encoder textcnn --seed 0 --run-type debug --exp-id A-inf-fusion-textcnn-s0-dbg-01
+python -m src.run_fusion --task informative --encoder textcnn --seed 0 --run-type final --exp-id A-inf-fusion-textcnn-s0-final-01
 python -m src.run_fusion --task informative --encoder bilstm --seed 1 --run-type final --exp-id A-inf-fusion-bilstm-s1-final-01
 python -m src.aggregate --part A --task informative
 ```
 
 Every run is logged to `env_tracker.csv` automatically. Experiment IDs must be unique, so increase the final number for a repeat run.
 
+The text-only, image-only and fusion runners use the same command pattern. Run each final learned-model variant with `--seed 0`, `--seed 1` and `--seed 2`, updating the `--exp-id` to match the model and seed. Some example IDs are already recorded; check `env_tracker.csv` and use a new final suffix for a repeat. All three runners select an available CUDA GPU automatically and otherwise use CPU; append `--device cpu` to run on CPU. Fusion uses the same shared defaults: Adam, learning rate `1e-3`, batch size 64, at most 20 epochs and early-stopping patience 3. Replace only `--encoder textcnn` with `--encoder bilstm` for the fusion architecture comparison.
+
 **Current Part A results:** `results/A/informative/summary.csv` holds the majority baseline plus every learned model (3 seeds each). Test macro-F1 is `0.7899 +/- 0.0067` for text-only TextCNN, `0.7923 +/- 0.0072` for text-only BiLSTM, `0.8069 +/- 0.0071` for image-only, `0.8566 +/- 0.0078` for Fusion TextCNN, and `0.8597 +/- 0.0057` for Fusion BiLSTM.
+
+**Fusion handoff:** [TextCNN fusion results](results/A/informative/fusion_textcnn/), [BiLSTM fusion results](results/A/informative/fusion_bilstm/) and the [six-case error analysis](results/A/informative/fusion_error_analysis.md) accompany the shared source and result formats. The recorded fusion runs used an NVIDIA GeForce RTX 4060 Laptop GPU, an Intel processor with 32 logical threads and approximately 17 GB RAM; cross-hardware training times should be interpreted with that context.
+
+**Selected Part A fusion checkpoint:** `A-inf-fusion-bilstm-s1-final-01.pt` (BiLSTM, seed 1, selected epoch 6 of 9 completed epochs). It has the highest validation macro-F1 among the six final fusion runs: `0.8494949716529766`. Its configuration and scores are in [the matching metrics file](results/A/informative/fusion_bilstm/seed1/metrics.json). The confusion matrices and qualitative analysis continue to use the median-validation seed 0 runs.
+
+The selected checkpoint is prepared for a separate handoff to the [team Drive folder](https://drive.google.com/drive/folders/1hX7LALiCbS5PT7GgCGWcd5wzwnbZfwpa); upload availability must be confirmed there. After downloading, place it in `checkpoints/`. Continue to obtain `features/resnet18_imagenet1k_v1.pt` from the same shared resource and verify the cache checksum above. Checkpoints, feature caches and raw data remain outside Git, as for the text-only and image-only models.
 
 ## Environmental protocol
 
@@ -269,3 +279,4 @@ Merge locally with Git, not through the GitHub web interface: `env_tracker.csv` 
 - Every run from the branch is in `env_tracker.csv`.
 - Vocabulary and any class weights are fitted on training data only.
 - No data, feature caches or checkpoints are committed.
+
