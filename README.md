@@ -205,9 +205,16 @@ The text-only, image-only and fusion runners use the same command pattern. Run e
 
 **Fusion handoff:** [TextCNN fusion results](results/A/informative/fusion_textcnn/), [BiLSTM fusion results](results/A/informative/fusion_bilstm/) and the [six-case error analysis](results/A/informative/fusion_error_analysis.md) accompany the shared source and result formats. The recorded fusion runs used an NVIDIA GeForce RTX 4060 Laptop GPU, an Intel processor with 32 logical threads and approximately 17 GB RAM; cross-hardware training times should be interpreted with that context.
 
-**Selected Part A fusion checkpoint:** `A-inf-fusion-bilstm-s1-final-01.pt` (BiLSTM, seed 1, selected epoch 6 of 9 completed epochs). It has the highest validation macro-F1 among the six final fusion runs: `0.8494949716529766`. Its configuration and scores are in [the matching metrics file](results/A/informative/fusion_bilstm/seed1/metrics.json). The confusion matrices and qualitative analysis continue to use the median-validation seed 0 runs.
+**Selected Part A fusion checkpoints:** provide one checkpoint for each fusion variant, following the existing per-model text/image handoff and experiment-ID filenames. Use each variant's median-validation run (the `cm_seed` in `summary.csv`), then retain that run's best-validation epoch. This keeps the delivered checkpoints aligned with the confusion-matrix runs.
 
-The selected checkpoint is prepared for a separate handoff to the [team Drive folder](https://drive.google.com/drive/folders/1hX7LALiCbS5PT7GgCGWcd5wzwnbZfwpa); upload availability must be confirmed there. After downloading, place it in `checkpoints/`. Continue to obtain `features/resnet18_imagenet1k_v1.pt` from the same shared resource and verify the cache checksum above. Checkpoints, feature caches and raw data remain outside Git, as for the text-only and image-only models.
+| Model | Checkpoint | Seed | Selected epoch | Validation macro-F1 |
+|---|---|---|---|---|
+| Fusion TextCNN | `A-inf-fusion-textcnn-s0-final-01.pt` | 0 | 1 | 0.8411893418 |
+| Fusion BiLSTM | `A-inf-fusion-bilstm-s0-final-01.pt` | 0 | 2 | 0.8478592615 |
+
+The configurations and scores are in the matching [TextCNN metrics](results/A/informative/fusion_textcnn/seed0/metrics.json) and [BiLSTM metrics](results/A/informative/fusion_bilstm/seed0/metrics.json). Checkpoint selection uses validation scores only; the test-set mean and standard deviation still include all three seeds for each variant.
+
+Both files are prepared for upload to the `checkpoints` subfolder of the [team Drive folder](https://drive.google.com/drive/folders/1XVTn41aTaLCrW2QymZhw8sJ1cst_LEBN); upload availability must be confirmed there. After downloading, place them in `checkpoints/`. Continue to reuse `features/resnet18_imagenet1k_v1.pt` from the shared cache resource and verify the cache checksum above. Checkpoints, feature caches and raw data remain outside Git, as for the text-only and image-only models.
 
 ## Environmental protocol
 
@@ -279,4 +286,5 @@ Merge locally with Git, not through the GitHub web interface: `env_tracker.csv` 
 - Every run from the branch is in `env_tracker.csv`.
 - Vocabulary and any class weights are fitted on training data only.
 - No data, feature caches or checkpoints are committed.
+
 
