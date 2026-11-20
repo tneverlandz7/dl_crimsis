@@ -1,0 +1,23 @@
+# Data and large artefacts
+data/*
+!data/.gitkeep
+features/*
+!features/.gitkeep
+checkpoints/*
+!checkpoints/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Tooling
+.codecarbon.config
+emissions.csv
+.DS_Store
+.idea/
+.vscode/

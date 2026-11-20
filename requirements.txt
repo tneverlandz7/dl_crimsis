@@ -1,0 +1,11 @@
+torch>=2.2
+torchvision>=0.17
+numpy>=1.26
+pandas>=2.1
+scikit-learn>=1.4
+matplotlib>=3.8
+Pillow>=10.0
+tqdm>=4.66
+psutil>=5.9
+codecarbon>=2.5
+huggingface_hub>=0.34
