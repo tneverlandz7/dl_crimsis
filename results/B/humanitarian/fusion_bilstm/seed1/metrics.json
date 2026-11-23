@@ -1,0 +1,275 @@
+{
+  "model": "fusion_bilstm",
+  "task": "humanitarian",
+  "part": "B",
+  "experiment_id": "B-hum-fusion-bilstm-s1-final-01",
+  "run_type": "final",
+  "seed": 1,
+  "config": {
+    "text_encoder": "bilstm",
+    "loss": "ce",
+    "class_weights": null,
+    "vocab_size": 5266,
+    "min_freq": 2,
+    "max_tokens": 64,
+    "embed_dim": 128,
+    "text_out_dim": 300,
+    "image_feature_dim": 512,
+    "image_out_dim": 256,
+    "image_encoder": "resnet18 IMAGENET1K_V1 (frozen, cached) -> shared ImageEncoder",
+    "image_dropout": 0.5,
+    "fusion_hidden_dim": 128,
+    "fusion_dropout": 0.5,
+    "lr": 0.001,
+    "batch_size": 64,
+    "max_epochs": 20,
+    "patience": 3,
+    "optimizer": "Adam"
+  },
+  "device": "cuda",
+  "trainable_params": 1213317,
+  "selected_epoch": 6,
+  "epochs_run": 9,
+  "early_stopped": true,
+  "train_time_s": 11.063627699855715,
+  "val_macro_f1": 0.6865650334466495,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.8325302804991422,
+      "dev_loss": 0.5951318740844727,
+      "dev_macro_f1": 0.5990243979996033,
+      "dev_accuracy": 0.7885771543086172
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.5069786933874951,
+      "dev_loss": 0.543864369392395,
+      "dev_macro_f1": 0.6180492403360218,
+      "dev_accuracy": 0.8006012024048096
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.35585415222229927,
+      "dev_loss": 0.5231034755706787,
+      "dev_macro_f1": 0.635335366631469,
+      "dev_accuracy": 0.8226452905811623
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.25447900808795465,
+      "dev_loss": 0.5532107949256897,
+      "dev_macro_f1": 0.6424989154279677,
+      "dev_accuracy": 0.8286573146292585
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.16948070445463154,
+      "dev_loss": 0.623992383480072,
+      "dev_macro_f1": 0.6279103895763531,
+      "dev_accuracy": 0.8136272545090181
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.09672873635653806,
+      "dev_loss": 0.7532992362976074,
+      "dev_macro_f1": 0.6865650334466495,
+      "dev_accuracy": 0.8166332665330661
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.053869192877986874,
+      "dev_loss": 0.9480488300323486,
+      "dev_macro_f1": 0.63654525131886,
+      "dev_accuracy": 0.7955911823647295
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.03525009770961883,
+      "dev_loss": 0.9855837225914001,
+      "dev_macro_f1": 0.6730962281749089,
+      "dev_accuracy": 0.8166332665330661
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.023452738261198758,
+      "dev_loss": 1.0179444551467896,
+      "dev_macro_f1": 0.6742637214020976,
+      "dev_accuracy": 0.8056112224448898
+    }
+  ],
+  "dev": {
+    "n": 998,
+    "accuracy": 0.8166332665330661,
+    "macro_f1": 0.6865650334466495,
+    "weighted_f1": 0.8157835964858051,
+    "per_class": {
+      "affected_individuals": {
+        "precision": 0.4,
+        "recall": 0.2222222222222222,
+        "f1": 0.2857142857142857,
+        "support": 9,
+        "correct": 2
+      },
+      "infrastructure_and_utility_damage": {
+        "precision": 0.6739130434782609,
+        "recall": 0.775,
+        "f1": 0.7209302325581395,
+        "support": 80,
+        "correct": 62
+      },
+      "rescue_volunteering_or_donation_effort": {
+        "precision": 0.7872340425531915,
+        "recall": 0.7449664429530202,
+        "f1": 0.7655172413793103,
+        "support": 149,
+        "correct": 111
+      },
+      "other_relevant_information": {
+        "precision": 0.8076923076923077,
+        "recall": 0.7907949790794979,
+        "f1": 0.7991543340380549,
+        "support": 239,
+        "correct": 189
+      },
+      "not_humanitarian": {
+        "precision": 0.8574144486692015,
+        "recall": 0.8656429942418427,
+        "f1": 0.8615090735434575,
+        "support": 521,
+        "correct": 451
+      }
+    },
+    "labels": [
+      "affected_individuals",
+      "infrastructure_and_utility_damage",
+      "rescue_volunteering_or_donation_effort",
+      "other_relevant_information",
+      "not_humanitarian"
+    ],
+    "confusion_matrix": [
+      [
+        2,
+        1,
+        4,
+        0,
+        2
+      ],
+      [
+        0,
+        62,
+        4,
+        3,
+        11
+      ],
+      [
+        0,
+        12,
+        111,
+        5,
+        21
+      ],
+      [
+        0,
+        6,
+        3,
+        189,
+        41
+      ],
+      [
+        3,
+        11,
+        19,
+        37,
+        451
+      ]
+    ]
+  },
+  "test": {
+    "n": 955,
+    "accuracy": 0.8052356020942408,
+    "macro_f1": 0.6960586653744825,
+    "weighted_f1": 0.8032357765792173,
+    "per_class": {
+      "affected_individuals": {
+        "precision": 0.5,
+        "recall": 0.3333333333333333,
+        "f1": 0.4,
+        "support": 9,
+        "correct": 3
+      },
+      "infrastructure_and_utility_damage": {
+        "precision": 0.7605633802816901,
+        "recall": 0.6666666666666666,
+        "f1": 0.7105263157894737,
+        "support": 81,
+        "correct": 54
+      },
+      "rescue_volunteering_or_donation_effort": {
+        "precision": 0.7542372881355932,
+        "recall": 0.7063492063492064,
+        "f1": 0.7295081967213115,
+        "support": 126,
+        "correct": 89
+      },
+      "other_relevant_information": {
+        "precision": 0.7939914163090128,
+        "recall": 0.7872340425531915,
+        "f1": 0.7905982905982906,
+        "support": 235,
+        "correct": 185
+      },
+      "not_humanitarian": {
+        "precision": 0.8311195445920304,
+        "recall": 0.8690476190476191,
+        "f1": 0.8496605237633366,
+        "support": 504,
+        "correct": 438
+      }
+    },
+    "labels": [
+      "affected_individuals",
+      "infrastructure_and_utility_damage",
+      "rescue_volunteering_or_donation_effort",
+      "other_relevant_information",
+      "not_humanitarian"
+    ],
+    "confusion_matrix": [
+      [
+        3,
+        1,
+        2,
+        0,
+        3
+      ],
+      [
+        0,
+        54,
+        3,
+        6,
+        18
+      ],
+      [
+        1,
+        4,
+        89,
+        7,
+        25
+      ],
+      [
+        0,
+        3,
+        4,
+        185,
+        43
+      ],
+      [
+        2,
+        9,
+        20,
+        35,
+        438
+      ]
+    ]
+  }
+}

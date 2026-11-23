@@ -50,6 +50,17 @@ def make_loader(tensors: dict[str, torch.Tensor], shuffle: bool = False, seed: i
                       sampler=sampler, generator=generator)
 
 
+def class_weights(train_labels: torch.Tensor, num_classes: int) -> torch.Tensor:
+    """Balanced class weights n / (C * n_c) from training labels only (Part B imbalance runs).
+
+        criterion = nn.CrossEntropyLoss(weight=class_weights(train_tensors["label"], len(config.LABELS[task])))
+    """
+    counts = torch.bincount(train_labels, minlength=num_classes).float()
+    if (counts == 0).any():
+        raise ValueError(f"Class with no training examples: counts={counts.tolist()}")
+    return counts.sum() / (num_classes * counts)
+
+
 def _to_device(batch: dict, device: torch.device) -> dict:
     return {k: v.to(device, non_blocking=True) for k, v in batch.items()}
 

@@ -8,13 +8,19 @@ Examples (each command writes a permanent row to env_tracker.csv):
     python -m src.run_fusion --task informative --encoder bilstm --seed 0 \
         --run-type final --exp-id A-inf-fusion-bilstm-s0-final-01
 
+    python -m src.run_fusion --task humanitarian --encoder textcnn --loss weighted --seed 0 \
+        --run-type final --exp-id B-hum-fusion-textcnn-w-s0-final-01
+
 Debug/exploratory runs evaluate on validation only and write to logs/<exp-id>/.
-Final runs also evaluate on test and write to results/<part>/<task>/fusion_<encoder>/seed<k>/.
+Final runs also evaluate on test and write to results/<part>/<task>/fusion_<encoder>/seed<k>/,
+with a "_weighted" suffix for class-weighted cross-entropy. Checkpoints go to
+checkpoints/<exp-id>.pt.
 """
 
 import argparse
 
 import torch
+from torch import nn
 
 from src import config
 from src.data import align_image_features, encode_labels, load_image_features, load_split
@@ -24,7 +30,7 @@ from src.models.fusion import FusionClassifier
 from src.models.image import ImageEncoder
 from src.models.text import ENCODERS, build_text_encoder
 from src.text import Vocab
-from src.train import make_loader, plot_learning_curves, predict, train_model
+from src.train import class_weights, make_loader, plot_learning_curves, predict, train_model
 from src.utils import count_trainable_params, get_device, set_seed
 
 
@@ -35,6 +41,8 @@ def parse_args():
     p = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     p.add_argument("--task", choices=config.TASKS, default="informative")
     p.add_argument("--encoder", choices=sorted(ENCODERS), default="textcnn")
+    p.add_argument("--loss", choices=["ce", "weighted"], default="ce",
+                   help="weighted = class-weighted cross-entropy (Part B imbalance comparison)")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--exp-id", required=True, help="<part>-<task>-fusion-<encoder>-s<seed>-<dbg|exp|final>-<nn>")
     p.add_argument("--run-type", choices=["debug", "exploratory", "final"], default="debug")
@@ -52,7 +60,7 @@ def parse_args():
 def main() -> None:
     args = parse_args()
     task, part, final = args.task, PART[args.task], args.run_type == "final"
-    model_name = f"fusion_{args.encoder}"
+    model_name = f"fusion_{args.encoder}" + ("_weighted" if args.loss == "weighted" else "")
     device = get_device(args.device)
     out_dir = (result_dir(part, task, model_name) / f"seed{args.seed}") if final else config.LOGS_DIR / args.exp_id
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -84,15 +92,18 @@ def main() -> None:
                 "label": encode_labels(df, task),
             }
 
-        train_loader = make_loader(tensors(splits["train"]), shuffle=True, seed=args.seed)
+        train_tensors = tensors(splits["train"])
+        train_loader = make_loader(train_tensors, shuffle=True, seed=args.seed)
         dev_loader = make_loader(tensors(splits["dev"]))
 
+        num_classes = len(config.LABELS[task])
+        weights = class_weights(train_tensors["label"], num_classes) if args.loss == "weighted" else None
         text_encoder = build_text_encoder(args.encoder, len(vocab), vocab.pad_id)
         image_encoder = ImageEncoder(dropout=args.image_dropout)
         model = FusionClassifier(
             text_encoder=text_encoder,
             image_encoder=image_encoder,
-            num_classes=len(config.LABELS[task]),
+            num_classes=num_classes,
             hidden_dim=args.hidden_dim,
             dropout=args.fusion_dropout,
         )
@@ -104,6 +115,7 @@ def main() -> None:
             device,
             lr=args.lr,
             max_epochs=args.max_epochs,
+            criterion=nn.CrossEntropyLoss(weight=weights),
         )
 
         summary = {
@@ -115,6 +127,8 @@ def main() -> None:
             "seed": args.seed,
             "config": {
                 "text_encoder": args.encoder,
+                "loss": args.loss,
+                "class_weights": weights.tolist() if weights is not None else None,
                 "vocab_size": len(vocab),
                 "min_freq": args.min_freq,
                 "max_tokens": config.MAX_TOKENS,
@@ -164,6 +178,7 @@ def main() -> None:
                 "vocab": vocab.itos,
                 "encoder": args.encoder,
                 "task": task,
+                "loss": args.loss,
                 "image_dropout": args.image_dropout,
                 "fusion_dropout": args.fusion_dropout,
                 "hidden_dim": args.hidden_dim,
@@ -186,11 +201,11 @@ def main() -> None:
     )
     for split in eval_splits:
         metrics = summary[split]
-        extra = (
-            f" inf_P={metrics['informative_precision']:.3f} inf_R={metrics['informative_recall']:.3f}"
-            if task == "informative"
-            else ""
-        )
+        if task == "informative":
+            extra = f" inf_P={metrics['informative_precision']:.3f} inf_R={metrics['informative_recall']:.3f}"
+        else:
+            rare = metrics["per_class"]["affected_individuals"]
+            extra = f" weighted_f1={metrics['weighted_f1']:.4f} affected={rare['correct']}/{rare['support']}"
         print(
             f"  {split:4s} acc={metrics['accuracy']:.4f} "
             f"macro_f1={metrics['macro_f1']:.4f}{extra}"

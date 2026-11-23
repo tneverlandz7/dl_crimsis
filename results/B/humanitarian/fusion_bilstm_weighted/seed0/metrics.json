@@ -1,0 +1,288 @@
+{
+  "model": "fusion_bilstm_weighted",
+  "task": "humanitarian",
+  "part": "B",
+  "experiment_id": "B-hum-fusion-bilstm-w-s0-final-01",
+  "run_type": "final",
+  "seed": 0,
+  "config": {
+    "text_encoder": "bilstm",
+    "loss": "weighted",
+    "class_weights": [
+      17.256338119506836,
+      2.0019607543945312,
+      1.3434211015701294,
+      0.9579358696937561,
+      0.3767527639865875
+    ],
+    "vocab_size": 5266,
+    "min_freq": 2,
+    "max_tokens": 64,
+    "embed_dim": 128,
+    "text_out_dim": 300,
+    "image_feature_dim": 512,
+    "image_out_dim": 256,
+    "image_encoder": "resnet18 IMAGENET1K_V1 (frozen, cached) -> shared ImageEncoder",
+    "image_dropout": 0.5,
+    "fusion_hidden_dim": 128,
+    "fusion_dropout": 0.5,
+    "lr": 0.001,
+    "batch_size": 64,
+    "max_epochs": 20,
+    "patience": 3,
+    "optimizer": "Adam"
+  },
+  "device": "cuda",
+  "trainable_params": 1213317,
+  "selected_epoch": 7,
+  "epochs_run": 10,
+  "early_stopped": true,
+  "train_time_s": 11.89314329996705,
+  "val_macro_f1": 0.6739973708551114,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.2189286640178445,
+      "dev_loss": 0.8330423831939697,
+      "dev_macro_f1": 0.5839187509951345,
+      "dev_accuracy": 0.6973947895791583
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.7392425775294439,
+      "dev_loss": 0.6557379961013794,
+      "dev_macro_f1": 0.6322905085024949,
+      "dev_accuracy": 0.7655310621242485
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.5175666609037712,
+      "dev_loss": 0.7005207538604736,
+      "dev_macro_f1": 0.6091933165706535,
+      "dev_accuracy": 0.7394789579158316
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.3344216772029496,
+      "dev_loss": 0.5713784098625183,
+      "dev_macro_f1": 0.6544967989547712,
+      "dev_accuracy": 0.7945891783567134
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.25269586561534124,
+      "dev_loss": 0.6748806834220886,
+      "dev_macro_f1": 0.6342335565058226,
+      "dev_accuracy": 0.7805611222444889
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.175229521551593,
+      "dev_loss": 0.6263468265533447,
+      "dev_macro_f1": 0.6472201226159869,
+      "dev_accuracy": 0.8066132264529058
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.11797087085215904,
+      "dev_loss": 0.6856960654258728,
+      "dev_macro_f1": 0.6739973708551114,
+      "dev_accuracy": 0.7955911823647295
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.1071332357519793,
+      "dev_loss": 0.6655129790306091,
+      "dev_macro_f1": 0.6484079406460863,
+      "dev_accuracy": 0.8086172344689379
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.06085047061599784,
+      "dev_loss": 0.7430969476699829,
+      "dev_macro_f1": 0.6387383386929546,
+      "dev_accuracy": 0.8016032064128257
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.04682534215883651,
+      "dev_loss": 0.8098412752151489,
+      "dev_macro_f1": 0.6413895456175343,
+      "dev_accuracy": 0.7995991983967936
+    }
+  ],
+  "dev": {
+    "n": 998,
+    "accuracy": 0.7955911823647295,
+    "macro_f1": 0.6739973708551114,
+    "weighted_f1": 0.798324371616974,
+    "per_class": {
+      "affected_individuals": {
+        "precision": 0.2222222222222222,
+        "recall": 0.4444444444444444,
+        "f1": 0.2962962962962963,
+        "support": 9,
+        "correct": 4
+      },
+      "infrastructure_and_utility_damage": {
+        "precision": 0.6146788990825688,
+        "recall": 0.8375,
+        "f1": 0.708994708994709,
+        "support": 80,
+        "correct": 67
+      },
+      "rescue_volunteering_or_donation_effort": {
+        "precision": 0.8275862068965517,
+        "recall": 0.6442953020134228,
+        "f1": 0.7245283018867924,
+        "support": 149,
+        "correct": 96
+      },
+      "other_relevant_information": {
+        "precision": 0.7777777777777778,
+        "recall": 0.8200836820083682,
+        "f1": 0.7983706720977597,
+        "support": 239,
+        "correct": 196
+      },
+      "not_humanitarian": {
+        "precision": 0.856858846918489,
+        "recall": 0.8272552783109405,
+        "f1": 0.841796875,
+        "support": 521,
+        "correct": 431
+      }
+    },
+    "labels": [
+      "affected_individuals",
+      "infrastructure_and_utility_damage",
+      "rescue_volunteering_or_donation_effort",
+      "other_relevant_information",
+      "not_humanitarian"
+    ],
+    "confusion_matrix": [
+      [
+        4,
+        3,
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        67,
+        1,
+        2,
+        9
+      ],
+      [
+        5,
+        13,
+        96,
+        5,
+        30
+      ],
+      [
+        0,
+        9,
+        2,
+        196,
+        32
+      ],
+      [
+        8,
+        17,
+        16,
+        49,
+        431
+      ]
+    ]
+  },
+  "test": {
+    "n": 955,
+    "accuracy": 0.8,
+    "macro_f1": 0.6593235417043349,
+    "weighted_f1": 0.8027633216267531,
+    "per_class": {
+      "affected_individuals": {
+        "precision": 0.125,
+        "recall": 0.2222222222222222,
+        "f1": 0.16,
+        "support": 9,
+        "correct": 2
+      },
+      "infrastructure_and_utility_damage": {
+        "precision": 0.6759259259259259,
+        "recall": 0.9012345679012346,
+        "f1": 0.7724867724867724,
+        "support": 81,
+        "correct": 73
+      },
+      "rescue_volunteering_or_donation_effort": {
+        "precision": 0.7818181818181819,
+        "recall": 0.6825396825396826,
+        "f1": 0.7288135593220338,
+        "support": 126,
+        "correct": 86
+      },
+      "other_relevant_information": {
+        "precision": 0.7786885245901639,
+        "recall": 0.8085106382978723,
+        "f1": 0.7933194154488518,
+        "support": 235,
+        "correct": 190
+      },
+      "not_humanitarian": {
+        "precision": 0.8658280922431866,
+        "recall": 0.8194444444444444,
+        "f1": 0.8419979612640163,
+        "support": 504,
+        "correct": 413
+      }
+    },
+    "labels": [
+      "affected_individuals",
+      "infrastructure_and_utility_damage",
+      "rescue_volunteering_or_donation_effort",
+      "other_relevant_information",
+      "not_humanitarian"
+    ],
+    "confusion_matrix": [
+      [
+        2,
+        2,
+        1,
+        0,
+        4
+      ],
+      [
+        1,
+        73,
+        0,
+        3,
+        4
+      ],
+      [
+        3,
+        8,
+        86,
+        7,
+        22
+      ],
+      [
+        0,
+        7,
+        4,
+        190,
+        34
+      ],
+      [
+        10,
+        18,
+        19,
+        44,
+        413
+      ]
+    ]
+  }
+}

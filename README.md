@@ -174,7 +174,7 @@ save_predictions(test_df, preds, probs, task, out_dir / "predictions_test.csv")
 ```
 
 - `train_model` follows the brief: Adam, batch size 64, at most 20 epochs, checkpoint chosen by validation macro-F1, patience 3.
-- **Part B imbalance:** pass `criterion=nn.CrossEntropyLoss(weight=w)` to `train_model`, or `sampler=WeightedRandomSampler(...)` to `make_loader`. Compute `w` from training labels only.
+- **Part B imbalance (team choice: class-weighted cross-entropy).** Use `w = class_weights(train_tensors["label"], num_classes)` from `src/train.py` (balanced weights `n / (C * n_c)` from training labels only) and pass `criterion=nn.CrossEntropyLoss(weight=w)` to `train_model`. Keep everything else unchanged. Add `--loss {ce,weighted}` to the runner, write weighted runs to `<model>_weighted/` and use a `-w-` experiment ID, e.g. `B-hum-image-w-s0-final-01` ([src/run_image.py](src/run_image.py) is the reference).
 - Evaluate on **test only in final runs**. Debug and exploratory runs should use validation only.
 
 **Results layout.** Final runs write to `results/<part>/<task>/<model>/seed<k>/`:
@@ -195,6 +195,9 @@ python -m src.run_fusion --task informative --encoder textcnn --seed 0 --run-typ
 python -m src.run_fusion --task informative --encoder textcnn --seed 0 --run-type final --exp-id A-inf-fusion-textcnn-s0-final-01
 python -m src.run_fusion --task informative --encoder bilstm --seed 1 --run-type final --exp-id A-inf-fusion-bilstm-s1-final-01
 python -m src.aggregate --part A --task informative
+python -m src.run_image --task humanitarian --seed 0 --run-type final --exp-id B-hum-image-s0-final-01
+python -m src.run_image --task humanitarian --loss weighted --seed 0 --run-type final --exp-id B-hum-image-w-s0-final-01
+python -m src.aggregate --part B --task humanitarian
 ```
 
 Every run is logged to `env_tracker.csv` automatically. Experiment IDs must be unique, so increase the final number for a repeat run.
@@ -202,6 +205,21 @@ Every run is logged to `env_tracker.csv` automatically. Experiment IDs must be u
 The text-only, image-only and fusion runners use the same command pattern. Run each final learned-model variant with `--seed 0`, `--seed 1` and `--seed 2`, updating the `--exp-id` to match the model and seed. Some example IDs are already recorded; check `env_tracker.csv` and use a new final suffix for a repeat. All three runners select an available CUDA GPU automatically and otherwise use CPU; append `--device cpu` to run on CPU. Fusion uses the same shared defaults: Adam, learning rate `1e-3`, batch size 64, at most 20 epochs and early-stopping patience 3. Replace only `--encoder textcnn` with `--encoder bilstm` for the fusion architecture comparison.
 
 **Current Part A results:** `results/A/informative/summary.csv` holds the majority baseline plus every learned model (3 seeds each). Test macro-F1 is `0.7899 +/- 0.0067` for text-only TextCNN, `0.7923 +/- 0.0072` for text-only BiLSTM, `0.8069 +/- 0.0071` for image-only, `0.8566 +/- 0.0078` for Fusion TextCNN, and `0.8597 +/- 0.0057` for Fusion BiLSTM.
+
+**Current Part B results:** `results/B/humanitarian/summary.csv` (3 seeds each, test set):
+
+| Model | Macro-F1 | Weighted-F1 | Accuracy | affected_individuals correct (/9) | Checkpoint (median validation) |
+|---|---|---|---|---|---|
+| Image-only | 0.5805 ± 0.0046 | 0.7607 ± 0.0017 | 0.7707 ± 0.0010 | 0, 0, 0 | `B-hum-image-s2-final-01.pt` |
+| Image-only, weighted | 0.6165 ± 0.0017 | 0.7313 ± 0.0027 | 0.7190 ± 0.0040 | 8, 7, 5 | `B-hum-image-w-s2-final-01.pt` |
+| Text-only TextCNN | 0.5456 ± 0.0392 | 0.7120 ± 0.0117 | 0.7211 ± 0.0087 | 0, 2, 0 | `B-hum-textcnn-s0-final-01.pt` |
+| Text-only TextCNN, weighted | 0.5718 ± 0.0159 | 0.7114 ± 0.0089 | 0.7106 ± 0.0063 | 1, 3, 2 | `B-hum-textcnn-w-s0-final-01.pt` |
+| Text-only BiLSTM | 0.5640 ± 0.0272 | 0.7145 ± 0.0072 | 0.7180 ± 0.0058 | 0, 1, 2 | `B-hum-bilstm-s2-final-01.pt` |
+| Text-only BiLSTM, weighted | 0.5805 ± 0.0116 | 0.7037 ± 0.0067 | 0.6998 ± 0.0058 | 2, 3, 2 | `B-hum-bilstm-w-s2-final-01.pt` |
+| Fusion TextCNN | 0.6678 ± 0.0511 | 0.8192 ± 0.0016 | 0.8234 ± 0.0022 | 3, 0, 0 | `B-hum-fusion-textcnn-s0-final-01.pt` |
+| Fusion TextCNN, weighted | 0.7185 ± 0.0048 | 0.8164 ± 0.0092 | 0.8157 ± 0.0100 | 4, 3, 4 | `B-hum-fusion-textcnn-w-s0-final-01.pt` |
+| Fusion BiLSTM | 0.6587 ± 0.0331 | 0.7985 ± 0.0116 | 0.8010 ± 0.0121 | 2, 3, 0 | `B-hum-fusion-bilstm-s1-final-01.pt` |
+| Fusion BiLSTM, weighted | 0.6881 ± 0.0304 | 0.8109 ± 0.0082 | 0.8101 ± 0.0100 | 2, 3, 3 | `B-hum-fusion-bilstm-w-s2-final-01.pt` |
 
 **Fusion handoff:** [TextCNN fusion results](results/A/informative/fusion_textcnn/), [BiLSTM fusion results](results/A/informative/fusion_bilstm/) and the [six-case error analysis](results/A/informative/fusion_error_analysis.md) accompany the shared source and result formats. The recorded fusion runs used an NVIDIA GeForce RTX 4060 Laptop GPU, an Intel processor with 32 logical threads and approximately 17 GB RAM; cross-hardware training times should be interpreted with that context.
 
@@ -215,6 +233,42 @@ The text-only, image-only and fusion runners use the same command pattern. Run e
 The configurations and scores are in the matching [TextCNN metrics](results/A/informative/fusion_textcnn/seed0/metrics.json) and [BiLSTM metrics](results/A/informative/fusion_bilstm/seed0/metrics.json). Checkpoint selection uses validation scores only; the test-set mean and standard deviation still include all three seeds for each variant.
 
 Both files are prepared for upload to the `checkpoints` subfolder of the [team Drive folder](https://drive.google.com/drive/folders/1XVTn41aTaLCrW2QymZhw8sJ1cst_LEBN); upload availability must be confirmed there. After downloading, place them in `checkpoints/`. Continue to reuse `features/resnet18_imagenet1k_v1.pt` from the shared cache resource and verify the cache checksum above. Checkpoints, feature caches and raw data remain outside Git, as for the text-only and image-only models.
+
+## Part B: text-only and fusion
+
+Image-only, text-only (TextCNN and BiLSTM), and fusion (both text encoders) are complete for Part B, each with ordinary and class-weighted cross-entropy. All runners use `--loss {ce,weighted}` and the shared training and evaluation interface.
+
+Text and image are strong on different classes (test F1, plain loss): text leads on `rescue_volunteering_or_donation_effort` (0.65–0.67 vs 0.55 for image), image leads on `infrastructure_and_utility_damage` (0.75 vs 0.53–0.55) and `other_relevant_information`. Weighting gives text a smaller macro-F1 gain (+0.02–0.03) and fewer extra `affected_individuals` hits (1–3/9) than image (5–8/9), but halves the text models' seed variance.
+
+**Imbalance method (team choice): class-weighted cross-entropy.** The brief requires the comparison only for fusion. Running it for all three models lets us compare how each modality handles the rare class.
+
+```python
+from src.train import class_weights
+w = class_weights(train_tensors["label"], len(config.LABELS[task]))
+result = train_model(..., criterion=nn.CrossEntropyLoss(weight=w))
+```
+
+- Use the shared helper instead of computing weights yourself. It uses training labels only, as the brief requires.
+- Change nothing else: keep the architecture, optimiser, batch size, epoch limit, patience and seeds 0/1/2 the same as your plain run.
+- Fusion writes weighted runs to `results/B/humanitarian/fusion_<encoder>_weighted/` and puts `-w-` in the experiment ID (e.g. `B-hum-fusion-textcnn-w-s0-final-01`), matching [src/run_image.py](src/run_image.py).
+- Run both `ce` and `weighted`, then `python -m src.aggregate --part B --task humanitarian`.
+- Every run adds a row to `env_tracker.csv`. Upload each model's median-validation checkpoint to the Drive.
+
+Full Part B fusion reproduction in PowerShell, from the activated environment (append `--device cpu` to each runner command for CPU):
+
+```powershell
+foreach ($seed in 0..2) {
+    python -m src.run_fusion --task humanitarian --encoder textcnn --loss ce --seed $seed --run-type final --exp-id "B-hum-fusion-textcnn-s${seed}-final-01"
+    python -m src.run_fusion --task humanitarian --encoder textcnn --loss weighted --seed $seed --run-type final --exp-id "B-hum-fusion-textcnn-w-s${seed}-final-01"
+    python -m src.run_fusion --task humanitarian --encoder bilstm --loss ce --seed $seed --run-type final --exp-id "B-hum-fusion-bilstm-s${seed}-final-01"
+    python -m src.run_fusion --task humanitarian --encoder bilstm --loss weighted --seed $seed --run-type final --exp-id "B-hum-fusion-bilstm-w-s${seed}-final-01"
+}
+python -m src.aggregate --part B --task humanitarian
+```
+
+These IDs are already used; increase the final suffix for a new run and retain its environmental log. Fusion's cached ResNet18 vectors are loaded from `features/resnet18_imagenet1k_v1.pt`; no feature extraction is required. The four selected fusion checkpoints are local in `checkpoints/drive_handoff/PartB_fusion/`, one per architecture/loss variant. Their median-validation seeds are 0, 0, 1 and 2 in table order. Upload those four `.pt` files separately to the `checkpoints` subfolder of the [team Drive folder](https://drive.google.com/drive/folders/1XVTn41aTaLCrW2QymZhw8sJ1cst_LEBN); Git ignores them, and Drive availability has not been independently verified. The test confusion matrices are in `figures/B_humanitarian_fusion_*_cm_test_median.png`.
+
+**Observed imbalance trade-off.** Ordinary cross-entropy finds some `affected_individuals` cases in fusion, unlike image-only, but its count varies across seeds. Weighting raises TextCNN fusion macro-F1 by 0.0508 and its rare-class correct count from 3/0/0 to 4/3/4, while average accuracy falls by 0.0077 and `not_humanitarian` F1 falls from 0.861 to 0.848. BiLSTM fusion macro-F1 rises by 0.0294 with weighting, while accuracy rises by 0.0091. The test rare class has only nine examples, so interpret these differences with that sample size. Per-class and four-error notes are in [docs/report_notes.md](docs/report_notes.md).
 
 ## Environmental protocol
 

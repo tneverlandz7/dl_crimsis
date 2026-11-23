@@ -1,0 +1,301 @@
+{
+  "model": "image_only_weighted",
+  "task": "humanitarian",
+  "part": "B",
+  "experiment_id": "B-hum-image-w-s2-final-01",
+  "run_type": "final",
+  "seed": 2,
+  "config": {
+    "loss": "weighted",
+    "class_weights": [
+      17.256338119506836,
+      2.0019607543945312,
+      1.3434211015701294,
+      0.9579358696937561,
+      0.3767527639865875
+    ],
+    "lr": 0.001,
+    "dropout": 0.5,
+    "image_feature_dim": 512,
+    "image_out_dim": 256,
+    "image_encoder": "resnet18 IMAGENET1K_V1 (frozen, cached)",
+    "batch_size": 64,
+    "max_epochs": 20,
+    "patience": 3,
+    "optimizer": "Adam"
+  },
+  "device": "cpu",
+  "trainable_params": 132613,
+  "selected_epoch": 10,
+  "epochs_run": 13,
+  "early_stopped": true,
+  "train_time_s": 0.9736453330006043,
+  "val_macro_f1": 0.5790278154055527,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 1.1208891261647504,
+      "dev_loss": 1.018011212348938,
+      "dev_macro_f1": 0.4980753395085483,
+      "dev_accuracy": 0.6032064128256514
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.8237515636958447,
+      "dev_loss": 0.8415300250053406,
+      "dev_macro_f1": 0.5497342048440965,
+      "dev_accuracy": 0.6803607214428857
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.748606705817373,
+      "dev_loss": 0.7407624125480652,
+      "dev_macro_f1": 0.5606902920038271,
+      "dev_accuracy": 0.7194388777555111
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.73334538802344,
+      "dev_loss": 0.8409651517868042,
+      "dev_macro_f1": 0.5318532570184344,
+      "dev_accuracy": 0.6733466933867736
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.7058921359622942,
+      "dev_loss": 0.762869656085968,
+      "dev_macro_f1": 0.5660804159511839,
+      "dev_accuracy": 0.7054108216432866
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.6571707027704935,
+      "dev_loss": 0.7697781920433044,
+      "dev_macro_f1": 0.5608954444502909,
+      "dev_accuracy": 0.7084168336673347
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.6139501334598864,
+      "dev_loss": 0.8035451173782349,
+      "dev_macro_f1": 0.5615526509482998,
+      "dev_accuracy": 0.6793587174348698
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.5957749971485667,
+      "dev_loss": 0.7933668494224548,
+      "dev_macro_f1": 0.5736182887644119,
+      "dev_accuracy": 0.6913827655310621
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.5757742090587946,
+      "dev_loss": 0.7974785566329956,
+      "dev_macro_f1": 0.5563472026707273,
+      "dev_accuracy": 0.6973947895791583
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.5468769509769755,
+      "dev_loss": 0.7668117880821228,
+      "dev_macro_f1": 0.5790278154055527,
+      "dev_accuracy": 0.7084168336673347
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.5587039989873237,
+      "dev_loss": 0.7325997948646545,
+      "dev_macro_f1": 0.5654214470564247,
+      "dev_accuracy": 0.7194388777555111
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.5115449783208905,
+      "dev_loss": 0.7875745892524719,
+      "dev_macro_f1": 0.5517264112838735,
+      "dev_accuracy": 0.6943887775551102
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.4973386993721113,
+      "dev_loss": 0.7808032035827637,
+      "dev_macro_f1": 0.5555861063202696,
+      "dev_accuracy": 0.7034068136272545
+    }
+  ],
+  "dev": {
+    "n": 998,
+    "accuracy": 0.7084168336673347,
+    "macro_f1": 0.5790278154055527,
+    "weighted_f1": 0.7182309918980666,
+    "per_class": {
+      "affected_individuals": {
+        "precision": 0.07142857142857142,
+        "recall": 0.2222222222222222,
+        "f1": 0.10810810810810811,
+        "support": 9,
+        "correct": 2
+      },
+      "infrastructure_and_utility_damage": {
+        "precision": 0.5607476635514018,
+        "recall": 0.75,
+        "f1": 0.6417112299465241,
+        "support": 80,
+        "correct": 60
+      },
+      "rescue_volunteering_or_donation_effort": {
+        "precision": 0.5678391959798995,
+        "recall": 0.7583892617449665,
+        "f1": 0.6494252873563219,
+        "support": 149,
+        "correct": 113
+      },
+      "other_relevant_information": {
+        "precision": 0.7175572519083969,
+        "recall": 0.7866108786610879,
+        "f1": 0.7504990019960079,
+        "support": 239,
+        "correct": 188
+      },
+      "not_humanitarian": {
+        "precision": 0.8557213930348259,
+        "recall": 0.6602687140115163,
+        "f1": 0.7453954496208017,
+        "support": 521,
+        "correct": 344
+      }
+    },
+    "labels": [
+      "affected_individuals",
+      "infrastructure_and_utility_damage",
+      "rescue_volunteering_or_donation_effort",
+      "other_relevant_information",
+      "not_humanitarian"
+    ],
+    "confusion_matrix": [
+      [
+        2,
+        0,
+        6,
+        0,
+        1
+      ],
+      [
+        1,
+        60,
+        9,
+        3,
+        7
+      ],
+      [
+        7,
+        9,
+        113,
+        3,
+        17
+      ],
+      [
+        3,
+        8,
+        7,
+        188,
+        33
+      ],
+      [
+        15,
+        30,
+        64,
+        68,
+        344
+      ]
+    ]
+  },
+  "test": {
+    "n": 955,
+    "accuracy": 0.7235602094240837,
+    "macro_f1": 0.6180279295244044,
+    "weighted_f1": 0.7342469091652055,
+    "per_class": {
+      "affected_individuals": {
+        "precision": 0.15151515151515152,
+        "recall": 0.5555555555555556,
+        "f1": 0.23809523809523808,
+        "support": 9,
+        "correct": 5
+      },
+      "infrastructure_and_utility_damage": {
+        "precision": 0.6914893617021277,
+        "recall": 0.8024691358024691,
+        "f1": 0.7428571428571429,
+        "support": 81,
+        "correct": 65
+      },
+      "rescue_volunteering_or_donation_effort": {
+        "precision": 0.4939759036144578,
+        "recall": 0.6507936507936508,
+        "f1": 0.5616438356164384,
+        "support": 126,
+        "correct": 82
+      },
+      "other_relevant_information": {
+        "precision": 0.7714285714285715,
+        "recall": 0.8042553191489362,
+        "f1": 0.7875,
+        "support": 235,
+        "correct": 189
+      },
+      "not_humanitarian": {
+        "precision": 0.8393285371702638,
+        "recall": 0.6944444444444444,
+        "f1": 0.760043431053203,
+        "support": 504,
+        "correct": 350
+      }
+    },
+    "labels": [
+      "affected_individuals",
+      "infrastructure_and_utility_damage",
+      "rescue_volunteering_or_donation_effort",
+      "other_relevant_information",
+      "not_humanitarian"
+    ],
+    "confusion_matrix": [
+      [
+        5,
+        0,
+        3,
+        0,
+        1
+      ],
+      [
+        4,
+        65,
+        6,
+        2,
+        4
+      ],
+      [
+        6,
+        5,
+        82,
+        7,
+        26
+      ],
+      [
+        0,
+        5,
+        5,
+        189,
+        36
+      ],
+      [
+        18,
+        19,
+        70,
+        47,
+        350
+      ]
+    ]
+  }
+}
