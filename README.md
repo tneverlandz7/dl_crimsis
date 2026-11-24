@@ -240,7 +240,7 @@ Image-only, text-only (TextCNN and BiLSTM), and fusion (both text encoders) are 
 
 Text and image are strong on different classes (test F1, plain loss): text leads on `rescue_volunteering_or_donation_effort` (0.65–0.67 vs 0.55 for image), image leads on `infrastructure_and_utility_damage` (0.75 vs 0.53–0.55) and `other_relevant_information`. Weighting gives text a smaller macro-F1 gain (+0.02–0.03) and fewer extra `affected_individuals` hits (1–3/9) than image (5–8/9), but halves the text models' seed variance.
 
-**Imbalance method (team choice): class-weighted cross-entropy.** The brief requires the comparison only for fusion. Running it for all three models lets us compare how each modality handles the rare class.
+**Imbalance method (team choice): class-weighted cross-entropy.** Part B asks for ordinary cross-entropy versus one imbalance intervention, with the fusion architecture and training budget held fixed. Applying the same intervention to text-only, image-only and fusion lets us compare how each modality handles the rare class.
 
 ```python
 from src.train import class_weights
